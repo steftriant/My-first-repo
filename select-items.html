@@ -1,0 +1,106 @@
+<form role="form" name="selectForm">
+	<script cam-script type="text/form-script">
+		camForm.on('form-loaded', function() {																			// The variable 'item' has not been loaded (fetched) from the server yet.
+			camForm.variableManager.fetchVariable('item');																// We tell the "Form SDK" to fetch the 'json' variable named 'item'.
+		});
+		camForm.on('variables-fetched', function() {																	// The variable 'item' has been loaded (fetched) from the server
+			$scope.item = camForm.variableManager.variableValue('item');												// and is bound to the current AngularJS $scope of the form.
+		});
+		$scope.selectedItem = [];
+		$scope.changeQuantity = function (x,index,chkselct) {															// We make a function named "changeQuantity".
+			console.log('x: ' +x.Quantity+ ', chkselct: ' +chkselct+ ', index: '+ index);
+			if (!chkselct) {																							// If item's checkbox is not "enabled",
+				x.Quantity=undefined;																					// then the respective "quantity" field has not a value.
+			}
+			$scope.item[index] = x;																						// We find the "selected" item (using "index") from the Array.  
+			$scope.total = total();																						// We make a function named "total".
+		}
+		function total() {																								// When "total" function gets called,
+			var total = 0;																								// the variable "total" is initialized.
+			angular.forEach($scope.item, function(x) {																	// The "forEach" function reads each selected "item" using "index" (assigned to "x") of the array.
+				if (x.Quantity) { 																						// If item's checkbox is "enabled" and "quantity" field has a value,
+					total += x.Price * x.Quantity;																		// then we can calculate "total" by calling the "total" function.												
+				}
+			})
+			console.log('Total: ' + total);																				// "total" value is displayed.
+			return total;																								// "return" statement stops the execution of the "total" function and returns a value from that function.
+		}
+	</script>
+	<div><h2>My List of Selected Items</h2></div>
+	<div>
+		<table ng-show="selectedItem.length>0" style="width:100%;">
+			<thead>
+				<tr>
+					<th style="width:140px;">Category</th>
+					<th style="width:305px;">Brief Description</th>
+					<th style="width:250px;">Detailed Description</th>
+					<th style="width:75px;">Price</th>
+					<th style="width:50px;">Quantity</th>
+					<th style="width:100px;">Subtotal</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="y in selectedItem track by $index">
+					<td><input style="width:140px;" type="text" value="{{y.Category}}" readonly /></td>
+					<td><input style="width:305px;" type="text" value="{{y.BriefDescription}}" readonly /></td>
+					<td><input style="width:250px;" type="file" value="{{y.DetailedDescription}}" readonly /></td>
+					<td><input style="width:75px;"  type="number" value="{{y.Price}}" readonly /></td>
+					<td><input style="width:50px;"  type="number" value="{{y.Quantity}}" readonly /></td>
+					<td><input style="width:100px;" type="number" value="{{y.Price * y.Quantity | currency}}"/></td>
+				</tr>
+				<tr>
+					<td><b>Total</b></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td><b>{{total | currency}}</b></td>	
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div ng-show="selectedItem.length<=0"><h3>No item selected</h3></div>
+	<hr>
+	<h2>My Order List</h2>																							
+	<div>
+		<table style="width:100%;">
+			<thead>
+				<tr>
+					<th style="width:140px;">Category</th>
+					<th style="width:305px;">Brief Description</th>
+					<th style="width:250px;">Detailed Description</th>
+					<th style="width:75px;" >Price</th>
+					<th></th>
+					<th>Quantity</th>
+					<th>Subtotal</th>
+				</tr>			
+			</thead>
+			<tbody>
+				<tr ng-repeat="x in item track by $index">
+					<td><input style="width:140px;" type="text" value="{{x.Category}}" readonly /></td>
+					<td><input style="width:305px;" type="text" value="{{x.BriefDescription}}" readonly /></td>
+					<td><input style="width:250px;" type="file" value="{{x.DetailedDescription}}" readonly /></td>			
+					<td><input style="width:75px;"  type="number" value="{{x.Price}}" readonly /></td>
+					<td><input style="width:25px;height:25px;" type="checkbox" ng-model="chkselct"													 					 
+							   								   cam-variable-name="isItemSelected"													
+							   								   cam-variable-type="Boolean"
+							   								   ng-change="changeQuantity(x, $index, chkselct)" /></td>										<!-- The "ng-change" directive calls the "changeQuantity" function when the value of checkbox changes. -->										
+					<td ng-show="chkselct"><input style="width:50px;" id="quantity" type="number" ng-model="x.Quantity"					
+												   					  				cam-variable-name="quantity" min="1"
+												   					  				cam-variable-type="Integer" 
+												   					  				ng-change="changeQuantity(x, $index, chkselct)" /></td>					<!-- The "ng-show" directive shows the "quantity" input field when a checkbox is checked. -->					
+					<td>{{x.Price * x.Quantity | currency}}</td>																								<!-- The "subtotal" amount (for each selected item) is displayed. -->
+				</tr>
+				<tr>
+					<td><b>Total</b></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td><b>{{total | currency}}</b></td>																										<!-- The "total" amount is displayed. -->
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</form> 
