@@ -1,0 +1,118 @@
+<form role="form" name="configureForm">
+	<script cam-script type="text/form-script">
+		var item = $scope.item = [];																							// Custom JavaScript creates a JavaScript Object and binds it to the current AngularJS $scope of the form as a variable named "item".															                                                        
+		$scope.addItem = function () {																							// We make a function named "addItem".
+			var item = {};																										// We add a new "item" to the Array.
+			item.Category = $scope.Category;
+			item.BriefDescription = $scope.BriefDescription;
+			if (!!$scope.camForm.fields[0].element[0].files[0]) {
+				item.DetailedDescription = $scope.camForm.fields[0].element[0].files[0].name;									// We check whether a file is uploaded.
+			} else {
+					return;																										// If no file is uploaded, it returns "undefined".
+			}
+			item.Price = $scope.Price;
+			$scope.item.push(item);																								// We use the value of the "item" input field to add a new "item" to the Array.
+			$scope.Category = "";																								// We clear the TextBox "Category".
+			$scope.BriefDescription = "";																						// We clear the TextBox "BriefDescription".
+			$scope.DetailedDescription = "";																					// We clear the TextBox "DetailedDescription".
+			$scope.Price = "";																									// We clear the TextBox "Price".
+		};
+		$scope.removeItem = function (index) {																					// We make a function named "removeItem". 					
+			var category = $scope.item[index].Category;																			// We find item's Category using "index" from the Array and binds it to the current AngularJS $scope of the form as a variable named "category".
+			$scope.item.splice(index, 1);																						// We use an index to remove an "item" from the Array.
+		}
+		$scope.isAddFormValid = function () {																					// We make a function named "isAddFormValid".
+			return ($scope.Category &&
+					$scope.BriefDescription &&
+					$scope.camForm.fields[0].element[0].files[0] &&
+					$scope.Price) ? true : false;																				// If all of the 4 parameters of variable "item" are added, the value will be "true", otherwise the value will be "false".
+		}
+		camForm.on('form-loaded', function() {																					// We hook into the lifecycle of Camunda SDK JS Form.
+			camForm.variableManager.createVariable ({																			// We "create" (declare) a new process variable  
+					name:'item',																								// named 'item' and
+					type:'json',																								// provide as type information 'json' used for serialization.
+					value:item
+			});
+		});
+		camForm.on('submit', function(evt) {																					// We hook into the lifecycle of Camunda SDK JS Form.
+			if (item.length<1) {																								// If no "item" is added,
+				evt.submitPrevented = true;																						// an event handler prevents the form from being submitted by setting the property "submitPrevented" to 'true'.
+			}
+		});
+	</script>
+	<h2>My List of Items</h2>																									<!-- We set the heading of the HTML Table. -->
+	<div>													
+		<table style="width:100%;">																								<!-- The HTML Table is populated from the JSON Array "item" using a "ng-repeat" directive. -->
+			<thead>																												<!-- We group the header content in the HTML Table. -->
+				<tr>																											<!-- Each row of the Table consists of 4 HTML Input Form fields and a button. -->
+					<th style="width:140px;">Category</th>
+					<th style="width:305px;">Brief Description</th>
+					<th style="width:250px;">Detailed Description</th>
+					<th style="width:75px;" >Price</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody ng-repeat="x in item track by $index">																		<!-- A "ng-repeat" directive is assigned to each row of the HTML Table in order to repeat all the objects of the JSON Array "item". -->
+				<tr>													
+					<td><input style="width:140px;" type="text" value="{{x.Category}}" readonly /></td>						
+					<td><input style="width:305px;" type="text" value="{{x.BriefDescription}}" readonly /></td>
+					<td><input style="width:250px;" type="text" value="{{x.DetailedDescription}}" readonly /></td>	
+					<td><input style="width:75px;"  type="number" value="{{x.Price}}" readonly /></td>
+					<td><input type="button" ng-click="removeItem($index)" value="Remove" /></td>								<!-- The "ng-click" directive is assigned to the button and calls the function named "removeItem" with the current "$index" when button is clicked. -->
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<hr>																														<!-- We separate the HTML content. -->
+	<div>
+		<h2>Add a new Item</h2>																									<!-- We set the heading of the HTML Form. -->
+		<div class="row">																										<!-- We set the "1st row" of the HTML Form. -->	
+			<div class="col-md-6">																								<!-- We use "md" for "medium" screen devices of width equal to or greater than 992px and "6" for adding 6 columns. -->															
+				<div class="form-group">																						<!-- We use "form-group" for optimum spacing. -->
+					<label class="control-label" for="category">Category</label>
+					<div class="controls">
+						<input style="width:140px;" id="category" type="text" ng-model="Category" />							<!-- The "ng-model" directive binds the value of the "Category" input field to the created variable "Category" in AngularJS. -->
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">																								
+				<div class="form-group">
+					<label class="control-label" for="briefDescription">Brief Description</label>
+					<div class="controls">
+						<input style="width:305px;" id="briefDescription" type="text" ng-model="BriefDescription" />			<!-- The "ng-model" directive binds the value of the "Brief Description" input field to the created variable "BriefDescription" in AngularJS. -->	
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">																										<!-- We set the "2nd row" of the HTML Form. -->
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="control-label" for="detailedDescription">Detailed Description</label>
+					<div class="controls">
+						<input style="width:250px;"
+							   id="detailedDescription"
+							   type="file"
+							   cam-variable-name="DetailedDescription"
+							   cam-variable-type="File"
+							   cam-max-filesize="10000000" ng-model="DetailedDescription" />									<!-- The "ng-model" directive binds the value of the "Detailed Description" input field to the created variable "DetailedDescription" in AngularJS. -->
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="control-label" for="price">Price</label>
+					<div class="controls">
+						<input style="width:75px;" id="price" type="number" ng-model="Price" />									<!-- The "ng-model" directive binds the value of the "Price" input field to the created variable "Price" in AngularJS. -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">																										<!-- We set the "3rd row" of the HTML Form. -->
+			<div class="col-md-4">																								<!-- We use "md" for medium screen devices of width equal to or greater than 992px and "4" for adding 4 columns. -->
+				<div class="controls">
+					<input type="button" ng-click="addItem()" ng-show="isAddFormValid()" value="Add" />							<!-- The "ng-show" directive shows the input element ("button") only if the "isAddFormValid()" expression (function) returns "true". The "ng-click" directive is assigned to the button and calls the function named "addItem" when "button" is clicked. -->
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
