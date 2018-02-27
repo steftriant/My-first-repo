@@ -60,7 +60,7 @@
 				<tr ng-repeat="x in item track by $index">
 					<td><input style="width:140px;" type="text" value="{{x.Category}}" readonly /></td>
 					<td><input style="width:305px;" type="text" value="{{x.BriefDescription}}" readonly /></td>
-					<td><input style="width:250px;" type="file" value="{{x.DetailedDescription}}" readonly /></td>			
+					<td><input style="width:250px;" type="text" value="{{x.DetailedDescription}}" readonly /></td>			
 					<td><input style="width:75px;"  type="number" value="{{x.Price}}" readonly /></td>
 					<td><input style="width:25px;height:25px;" type="checkbox" ng-model="chkselct"													 					 
 							   								   cam-variable-name="isItemSelected"													
