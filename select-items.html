@@ -28,7 +28,7 @@
 			var selectedItem = [];																						// We create a new Array as a variable named "selectedItem".
 			angular.forEach($scope.item, function(x) {																	// For each item of the "item" Array 
 				if (x.Quantity) {																						// if item's "quantity" input field has a value (so, item's "checkbox" is checked),
-					$scope.selectedItem.push(item);																		// we add the selected item to the "selectedItem" Array	
+					selectedItem.push(x);																		// we add the selected item to the "selectedItem" Array	
 				}
 			})
 			if (selectedItem.length<1) {																				// If no "item" has been selected from the table,
@@ -37,7 +37,7 @@
 				camForm.variableManager.createVariable ({																// We "create" (declare) a new process variable
 					name: 'selectedItem',																				// named 'selectedItem' and
 					type: 'json',																						// provide as type information 'json' used for serialization.
-					value: JSON.stringify(selectedItem)																	// Using this function, we convert JavaScript Array "selectedItem" into a "string" in order to be read by the web server. 
+					value: selectedItem																	// Using this function, we convert JavaScript Array "selectedItem" into a "string" in order to be read by the web server. 
 				});	
 			}
 		});
