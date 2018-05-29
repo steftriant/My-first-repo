@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>																																
+		<meta charset="UTF-8">																											
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">															
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">																			
+		<title>Select products</title> 																										
+	</head>
+	<body>
+		<form role="form" name="selectForm" accept-charset="utf-8">
+			<h2>Λίστα Προϊόντων</h2>																							
+			<div>
+				<table style="width:100%;">
+					<thead>
+						<tr>
+							<th style="width:140px;">Κατηγορία</th>
+							<th style="width:305px;">Περιγραφή</th>
+							<th style="width:250px;">Λεπτομέρειες</th>
+							<th style="width:75px;" >Τιμή (€)</th>
+							<th></th>
+							<th>Ποσότητα</th>
+							<th>Μερικό Σύνολο</th>
+						</tr>			
+					</thead>
+					<tbody>
+						<tr ng-repeat="x in product track by $index">
+							<td><input style="width:140px;" type="text" value="{{x.Category}}" readonly /></td>
+							<td><input style="width:305px;" type="text" value="{{x.Description}}" readonly /></td>
+							<td><input style="width:250px;" type="text" value="{{x.Details}}" readonly /></td>			
+							<td><input style="width:75px;"  type="number" value="{{x.Price}}" readonly /></td>
+							<td><input style="width:25px;height:25px;" type="checkbox" ng-model="chkselct"													 					 
+							   										   cam-variable-name="isProductSelected"													
+							   								   		   cam-variable-type="Boolean"
+							   								   		   ng-change="changeQuantity(x, $index, chkselct)" /></td>								<!-- "ng-change" directive calls the "changeQuantity ()" function at every change in the value of "checkbox" input field. -->										
+							<td ng-show="chkselct"><input style="width:50px;" id="quantity" type="number" ng-model="x.Quantity"					
+												   					  		  cam-variable-name="quantity" min="1"
+												   					  		  cam-variable-type="Integer" 
+												   					  		  ng-change="changeQuantity(x, $index, chkselct)" /></td>						<!-- "ng-change" directive calls the "changeQuantity ()" function at every change in the value of "quantity" input field. "ng-show" directive shows the "quantity" input field when "checkbox" is checked. -->					
+							<td>{{x.Price * x.Quantity | currency}}</td>																					<!-- "Subtotal" amount is displayed. -->
+						</tr>
+						<tr>
+							<td><b>Σύνολο</b></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td><b>{{total | currency}}</b></td>																							<!-- "Total" amount is displayed. -->
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<script src="select-product.js" charset="utf-8" cam-script type="text/form-script"></script>
+		</form>
+	</body>
+</html> 
