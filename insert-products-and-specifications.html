@@ -33,19 +33,14 @@
 							$scope.camForm.fields[0].element[0].files[0] &&
 							$scope.Price) ? true : false;																												// If all of the 3 input fields of variable "product" are filled in, the "isAddFormValid" function (expression) returns "true", otherwise the function returns "false".
 				}
-				camForm.on('form-loaded', function() {																													// We hook into the lifecycle of Camunda SDK JS Form.
+				inject(['$http', 'Uri', function($http, Uri) {
+					camForm.on('form-loaded', function() {																													// We hook into the lifecycle of Camunda SDK JS Form.
 						camForm.variableManager.createVariable ({																										// We "create" (declare) a new "process" variable  
 							name:'product',																																// named 'product' and
 							type:'json',																																// provide as type information 'json' used for serialization.
 							value:product
 						});
-				});
-				camForm.on('submit', function(evt) {																													// We hook into the lifecycle of Camunda SDK JS Form.
-						if (product.length<1) {																															// If no any "product" is added,
-							evt.submitPrevented = true;																													// an event handler prevents the form from being submitted by setting the property "submitPrevented" to 'true'.
-						}
-				});
-				inject(['$http', 'Uri', function($http, Uri) {
+					});
 					camForm.on('store', function(evt) {																													// We hook into the lifecycle of Camunda SDK JS Form.																													
 						evt.retrieveVariables()
 						var varManager = evt.variableManager;
@@ -72,6 +67,11 @@
 						};
 						$http.post(Uri.appUri('engine://engine/:engine/task/' + camForm.taskId + '/variables'), data, config);
 						evt.storePrevented = true;																														// An event handler may prevent the "store" from being executed by setting the property "storePrevented" to 'true'.
+					});
+					camForm.on('submit', function(evt) {																													// We hook into the lifecycle of Camunda SDK JS Form.
+						if (product.length<1) {																															// If no any "product" is added,
+							evt.submitPrevented = true;																													// an event handler prevents the form from being submitted by setting the property "submitPrevented" to 'true'.
+						}
 					});
 				}]);
 			</script>
@@ -105,7 +105,7 @@
 							<label class="control-label" for="description">Περιγραφή</label>
 							<div class="controls">
 								<input id="description" type="text" 
-									   onkeypress="this.style.width = ((this.value.length + 1) * 8) + 'px';" ng-model="Description" />									<!-- When the value of the input field "Περιγραφή" changes, is bound to the created variable "Description" in AngularJS by the "ng-model" directive. -->	
+								       onkeypress="this.style.width = ((this.value.length + 1) * 8) + 'px';" ng-model="Description" />									<!-- When the value of the input field "Περιγραφή" changes, is bound to the created variable "Description" in AngularJS by the "ng-model" directive. -->	
 							</div>
 						</div>
 					</div>
@@ -117,8 +117,8 @@
 							<div class="controls">
 								<input id="details" type="file"
 							   		   cam-variable-name="Details"
-							           cam-variable-type="File"
-							           cam-max-filesize="10000000" ng-model="Details" />																				<!-- When the value of the input field "Λεπτομέρειες" changes, is bound to the created variable "Details" in AngularJS by the "ng-model" directive. -->
+							           	   cam-variable-type="File"
+							           	   cam-max-filesize="10000000" ng-model="Details" />																				<!-- When the value of the input field "Λεπτομέρειες" changes, is bound to the created variable "Details" in AngularJS by the "ng-model" directive. -->
 							</div>
 						</div>
 					</div>
