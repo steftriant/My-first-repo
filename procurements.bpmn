@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1y7vlyp" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.16.2">
+  <bpmn:collaboration id="Collaboration_04o8aan">
+    <bpmn:participant id="Participant_0iw5n56" name="Εισαγωγή Προϊόντων από Κεντρικό" processRef="InsertProducts" />
+    <bpmn:participant id="Participant_1tmquh2" name="Διαλογή Προϊόντων από Τοπικούς" processRef="SelectProducts" />
+  </bpmn:collaboration>
+  <bpmn:process id="InsertProducts" name="Insert Products" isExecutable="true">
+    <bpmn:sequenceFlow id="SequenceFlow_0893qdm" sourceRef="Task_1j6a0u5" targetRef="Task_0l8c3i7" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ozvziu" sourceRef="StartEvent_1" targetRef="Task_1j6a0u5" />
+    <bpmn:userTask id="Task_1j6a0u5" name="Εισήγαγε προϊόντα και προδιαγραφές" camunda:formKey="embedded:app:forms/insert-products-and-specifications.html" camunda:assignee="cAdmin">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="end">
+          <camunda:script scriptFormat="javascript">var administration = S('{ "administration" : ["userA", "userB", "userC", "userD", "userE", "userF"] }');
+execution.setVariable("administration", administration)
+
+var jsonValue = S('{ }')
+execution.setVariable("aggregatedList", jsonValue)</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1ozvziu</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0893qdm</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:startEvent id="StartEvent_1" name="Ώρα για προμήθειες" camunda:formKey="embedded:app:forms/time-for-procurements.html">
+      <bpmn:outgoing>SequenceFlow_1ozvziu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:callActivity id="Task_0l8c3i7" name="Διαλογή Προϊόντων από Τοπικούς" calledElement="SelectProducts">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0893qdm</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_13p0wgh</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="${administration.prop(&#34;administration&#34;).elements()}" camunda:elementVariable="assignee" />
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="SequenceFlow_13p0wgh" sourceRef="Task_0l8c3i7" targetRef="Task_02trbir" />
+    <bpmn:userTask id="Task_02trbir" name="Λάβε τις παραγγελίες" camunda:formKey="embedded:app:forms/receive-the-orders.html" camunda:assignee="cAdmin">
+      <bpmn:extensionElements>
+        <camunda:taskListener class="org.camunda.bpm.myproject.electronic_equipment_competitions.TaskAssignmentListener" event="create" />
+        <camunda:taskListener class="org.camunda.bpm.myproject.electronic_equipment_competitions.GenerationDocumentDelegate" event="complete" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_13p0wgh</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_17tdv3m</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_17tdv3m" sourceRef="Task_02trbir" targetRef="Task_06byabw" />
+    <bpmn:userTask id="Task_06byabw" name="Εξήγαγε το τελικό έγγραφο" camunda:formKey="embedded:app:forms/download-the-final-document.html" camunda:assignee="cAdmin">
+      <bpmn:incoming>SequenceFlow_17tdv3m</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_12vbzfc</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_10nsvei" name="Τέλος Διαδικασίας">
+      <bpmn:incoming>SequenceFlow_12vbzfc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_12vbzfc" sourceRef="Task_06byabw" targetRef="EndEvent_10nsvei" />
+  </bpmn:process>
+  <bpmn:process id="SelectProducts" name="Selection of Products" isExecutable="true">
+    <bpmn:userTask id="Task_1ekhucg" name="Επίλεξε Προϊόντα" camunda:asyncAfter="true" camunda:formKey="embedded:app:forms/select-product.html" camunda:assignee="${assignee.value()}">
+      <bpmn:extensionElements>
+        <camunda:taskListener event="complete">
+          <camunda:script scriptFormat="javascript">var aggregatedList = task.execution.getSuperExecution().getVariable("aggregatedList");
+var selectedProduct = task.execution.getVariable("selectedProduct");
+aggregatedList.prop(task.assignee,selectedProduct);
+task.execution.getSuperExecution().setVariable("aggregatedList", aggregatedList);</camunda:script>
+        </camunda:taskListener>
+        <camunda:taskListener class="org.camunda.bpm.myproject.electronic_equipment_competitions.TaskAssignmentListener" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0apewv9</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1p2grop</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_0c5nfaa" name="Προϊόντα Επιλέχθηκαν">
+      <bpmn:incoming>SequenceFlow_1p2grop</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="StartEvent_1hmrmzp" name="Λίστα Ελήφθη">
+      <bpmn:outgoing>SequenceFlow_0apewv9</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1p2grop" sourceRef="Task_1ekhucg" targetRef="EndEvent_0c5nfaa" />
+    <bpmn:sequenceFlow id="SequenceFlow_0apewv9" sourceRef="StartEvent_1hmrmzp" targetRef="Task_1ekhucg" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_04o8aan">
+      <bpmndi:BPMNShape id="Participant_0iw5n56_di" bpmnElement="Participant_0iw5n56">
+        <dc:Bounds x="191" y="83" width="926" height="279" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="241" y="158" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="231" y="201" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_1tmquh2_di" bpmnElement="Participant_1tmquh2">
+        <dc:Bounds x="368" y="380" width="369" height="216" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0893qdm_di" bpmnElement="SequenceFlow_0893qdm">
+        <di:waypoint x="442" y="176" />
+        <di:waypoint x="519" y="176" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ozvziu_di" bpmnElement="SequenceFlow_1ozvziu">
+        <di:waypoint x="277" y="176" />
+        <di:waypoint x="342" y="176" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_13m8f37_di" bpmnElement="Task_1j6a0u5">
+        <dc:Bounds x="342" y="136" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1suzsy1_di" bpmnElement="Task_02trbir">
+        <dc:Bounds x="673" y="135" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0apewv9_di" bpmnElement="SequenceFlow_0apewv9">
+        <di:waypoint x="469" y="479" />
+        <di:waypoint x="513" y="479" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1p2grop_di" bpmnElement="SequenceFlow_1p2grop">
+        <di:waypoint x="613" y="479" />
+        <di:waypoint x="654" y="479" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1lj1yl3_di" bpmnElement="Task_1ekhucg">
+        <dc:Bounds x="513" y="439" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_19do5t8_di" bpmnElement="EndEvent_0c5nfaa">
+        <dc:Bounds x="654" y="461" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="640" y="504" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_09c5pbv_di" bpmnElement="StartEvent_1hmrmzp">
+        <dc:Bounds x="433" y="461" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="418" y="504" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_1al4zt4_di" bpmnElement="Task_0l8c3i7">
+        <dc:Bounds x="519" y="136" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_13p0wgh_di" bpmnElement="SequenceFlow_13p0wgh">
+        <di:waypoint x="619" y="176" />
+        <di:waypoint x="673" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_17tdv3m_di" bpmnElement="SequenceFlow_17tdv3m">
+        <di:waypoint x="773" y="175" />
+        <di:waypoint x="827" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0u5yut7_di" bpmnElement="Task_06byabw">
+        <dc:Bounds x="827" y="135" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_10nsvei_di" bpmnElement="EndEvent_10nsvei">
+        <dc:Bounds x="981" y="157" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="955" y="200" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_12vbzfc_di" bpmnElement="SequenceFlow_12vbzfc">
+        <di:waypoint x="927" y="175" />
+        <di:waypoint x="981" y="175" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
