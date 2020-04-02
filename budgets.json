@@ -1,0 +1,19 @@
+[{
+	"email":"johnny@ict.tuc.gr", "faculty":"Διεύθυνση Τηλεπικοινωνιών, Δικτύων και Υπολογιστικής Υποδομής", "budget":36100, "username":"johnny"
+},{
+	"email":"dina@ict.tuc.gr", "faculty":"Τμήμα Διοικητικής Υπολογιστικής Υποδομής", "budget":15950, "username":"kglymidaki"
+},{
+	"email":"mpathiaki1@isc.tuc.gr", "faculty":"Τμήμα Διοικητικής Υπολογιστικής Υποδομής", "budget":15950, "username":"mpathiaki1"
+},{
+	"email":"nispanoudakis@isc.tuc.gr", "faculty":"Σχολή Μηχανικών Παραγωγής και Διοίκησης", "budget":5000, "username":"nispanoudakis"
+},{
+	"email":"pkonto@ict.tuc.gr", "faculty":"Τμήμα Εκπαιδευτικής Υπολογιστικής Υποδομής", "budget":9760, "username":"pkonto"
+},{
+	"email":"spanaki@ict.tuc.gr", "faculty":"Τμήμα Τηλεπικοινωνιών και Δικτύων", "budget":7500, "username":"spanaki"
+},{
+	"email":"striantis@isc.tuc.gr", "faculty":"Σχολή Μηχανικών Παραγωγής και Διοίκησης", "budget":5000, "username":"striantis"
+},{
+	"email":"tlyrantonaki@isc.tuc.gr", "faculty":"Τμήμα Τηλεπικοινωνιών και Δικτύων", "budget":6565, "username":"tlyrantonaki"
+},{
+	"email":"vpapadakis@isc.tuc.gr", "faculty":"Τμήμα Διοικητικής Υπολογιστικής Υποδομής", "budget":4212, "username":"vpapadakis"
+}]
